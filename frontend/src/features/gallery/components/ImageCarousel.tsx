@@ -11,12 +11,18 @@ interface ImageCarouselProps {
   className?: string
   /** Tailwind classes controlling the image box's size (aspect-ratio and/or a fixed height). Defaults to 16:9 landscape. */
   boxClassName?: string
+  /** 'cover' crops to fill the box (fine when images roughly match the box's shape). 'contain' shows the whole image, letterboxed — use for images whose aspect ratio doesn't match the box (e.g. portrait photos in a box sized by height). */
+  fit?: 'cover' | 'contain'
+  /** Default Tailwind object-position class, e.g. 'object-top' to crop from the bottom instead of centering. Only matters when fit="cover". Overridden per-image by GalleryImage.objectPosition. */
+  objectPosition?: string
 }
 
 export function ImageCarousel({
   images,
   className = 'max-w-3xl',
   boxClassName = 'aspect-video',
+  fit = 'cover',
+  objectPosition = 'object-center',
 }: ImageCarouselProps) {
   const [index, setIndex] = useState(0)
   const current = images[index]
@@ -33,7 +39,15 @@ export function ImageCarousel({
           'relative overflow-hidden rounded-lg border border-zinc-200 bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-900',
         )}
       >
-        <img src={current.src} alt={current.alt} className="h-full w-full object-cover" />
+        <img
+          src={current.src}
+          alt={current.alt}
+          className={cn(
+            'h-full w-full',
+            fit === 'contain' ? 'object-contain' : 'object-cover',
+            current.objectPosition ?? objectPosition,
+          )}
+        />
 
         {images.length > 1 && (
           <>
